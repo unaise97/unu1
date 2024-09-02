@@ -17,6 +17,8 @@ import { Project } from "./Project";
 import { ProjectCountArgs } from "./ProjectCountArgs";
 import { ProjectFindManyArgs } from "./ProjectFindManyArgs";
 import { ProjectFindUniqueArgs } from "./ProjectFindUniqueArgs";
+import { CreateProjectArgs } from "./CreateProjectArgs";
+import { UpdateProjectArgs } from "./UpdateProjectArgs";
 import { DeleteProjectArgs } from "./DeleteProjectArgs";
 import { ProjectService } from "../project.service";
 @graphql.Resolver(() => Project)
@@ -48,6 +50,35 @@ export class ProjectResolverBase {
       return null;
     }
     return result;
+  }
+
+  @graphql.Mutation(() => Project)
+  async createProject(
+    @graphql.Args() args: CreateProjectArgs
+  ): Promise<Project> {
+    return await this.service.createProject({
+      ...args,
+      data: args.data,
+    });
+  }
+
+  @graphql.Mutation(() => Project)
+  async updateProject(
+    @graphql.Args() args: UpdateProjectArgs
+  ): Promise<Project | null> {
+    try {
+      return await this.service.updateProject({
+        ...args,
+        data: args.data,
+      });
+    } catch (error) {
+      if (isRecordNotFoundError(error)) {
+        throw new GraphQLError(
+          `No resource was found for ${JSON.stringify(args.where)}`
+        );
+      }
+      throw error;
+    }
   }
 
   @graphql.Mutation(() => Project)

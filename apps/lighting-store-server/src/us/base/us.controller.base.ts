@@ -22,6 +22,12 @@ import { US } from "./US";
 import { USFindManyArgs } from "./USFindManyArgs";
 import { USWhereUniqueInput } from "./USWhereUniqueInput";
 import { USUpdateInput } from "./USUpdateInput";
+import { OrderFindManyArgs } from "../../order/base/OrderFindManyArgs";
+import { Order } from "../../order/base/Order";
+import { OrderWhereUniqueInput } from "../../order/base/OrderWhereUniqueInput";
+import { ReviewFindManyArgs } from "../../review/base/ReviewFindManyArgs";
+import { Review } from "../../review/base/Review";
+import { ReviewWhereUniqueInput } from "../../review/base/ReviewWhereUniqueInput";
 
 export class USControllerBase {
   constructor(protected readonly service: USService) {}
@@ -29,10 +35,30 @@ export class USControllerBase {
   @swagger.ApiCreatedResponse({ type: US })
   async createUS(@common.Body() data: USCreateInput): Promise<US> {
     return await this.service.createUs({
-      data: data,
+      data: {
+        ...data,
+
+        category: data.category
+          ? {
+              connect: data.category,
+            }
+          : undefined,
+      },
       select: {
+        category: {
+          select: {
+            id: true,
+          },
+        },
+
         createdAt: true,
+        description: true,
         id: true,
+        indexCategory: true,
+        name: true,
+        price: true,
+        stockQuantity: true,
+        uniqueName: true,
         updatedAt: true,
       },
     });
@@ -46,8 +72,20 @@ export class USControllerBase {
     return this.service.usItems({
       ...args,
       select: {
+        category: {
+          select: {
+            id: true,
+          },
+        },
+
         createdAt: true,
+        description: true,
         id: true,
+        indexCategory: true,
+        name: true,
+        price: true,
+        stockQuantity: true,
+        uniqueName: true,
         updatedAt: true,
       },
     });
@@ -60,8 +98,20 @@ export class USControllerBase {
     const result = await this.service.us({
       where: params,
       select: {
+        category: {
+          select: {
+            id: true,
+          },
+        },
+
         createdAt: true,
+        description: true,
         id: true,
+        indexCategory: true,
+        name: true,
+        price: true,
+        stockQuantity: true,
+        uniqueName: true,
         updatedAt: true,
       },
     });
@@ -83,10 +133,30 @@ export class USControllerBase {
     try {
       return await this.service.updateUs({
         where: params,
-        data: data,
+        data: {
+          ...data,
+
+          category: data.category
+            ? {
+                connect: data.category,
+              }
+            : undefined,
+        },
         select: {
+          category: {
+            select: {
+              id: true,
+            },
+          },
+
           createdAt: true,
+          description: true,
           id: true,
+          indexCategory: true,
+          name: true,
+          price: true,
+          stockQuantity: true,
+          uniqueName: true,
           updatedAt: true,
         },
       });
@@ -110,8 +180,20 @@ export class USControllerBase {
       return await this.service.deleteUs({
         where: params,
         select: {
+          category: {
+            select: {
+              id: true,
+            },
+          },
+
           createdAt: true,
+          description: true,
           id: true,
+          indexCategory: true,
+          name: true,
+          price: true,
+          stockQuantity: true,
+          uniqueName: true,
           updatedAt: true,
         },
       });
@@ -123,5 +205,175 @@ export class USControllerBase {
       }
       throw error;
     }
+  }
+
+  @common.Get("/:id/orders")
+  @ApiNestedQuery(OrderFindManyArgs)
+  async findOrders(
+    @common.Req() request: Request,
+    @common.Param() params: USWhereUniqueInput
+  ): Promise<Order[]> {
+    const query = plainToClass(OrderFindManyArgs, request.query);
+    const results = await this.service.findOrders(params.id, {
+      ...query,
+      select: {
+        createdAt: true,
+        id: true,
+        indexLight: true,
+        indexOrderDate: true,
+
+        light: {
+          select: {
+            id: true,
+          },
+        },
+
+        orderDate: true,
+        quantity: true,
+        totalAmount: true,
+        updatedAt: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/orders")
+  async connectOrders(
+    @common.Param() params: USWhereUniqueInput,
+    @common.Body() body: OrderWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      orders: {
+        connect: body,
+      },
+    };
+    await this.service.updateUs({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/orders")
+  async updateOrders(
+    @common.Param() params: USWhereUniqueInput,
+    @common.Body() body: OrderWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      orders: {
+        set: body,
+      },
+    };
+    await this.service.updateUs({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/orders")
+  async disconnectOrders(
+    @common.Param() params: USWhereUniqueInput,
+    @common.Body() body: OrderWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      orders: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateUs({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Get("/:id/reviews")
+  @ApiNestedQuery(ReviewFindManyArgs)
+  async findReviews(
+    @common.Req() request: Request,
+    @common.Param() params: USWhereUniqueInput
+  ): Promise<Review[]> {
+    const query = plainToClass(ReviewFindManyArgs, request.query);
+    const results = await this.service.findReviews(params.id, {
+      ...query,
+      select: {
+        comment: true,
+        createdAt: true,
+        id: true,
+        indexLight: true,
+
+        light: {
+          select: {
+            id: true,
+          },
+        },
+
+        rating: true,
+        updatedAt: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/reviews")
+  async connectReviews(
+    @common.Param() params: USWhereUniqueInput,
+    @common.Body() body: ReviewWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      reviews: {
+        connect: body,
+      },
+    };
+    await this.service.updateUs({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/reviews")
+  async updateReviews(
+    @common.Param() params: USWhereUniqueInput,
+    @common.Body() body: ReviewWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      reviews: {
+        set: body,
+      },
+    };
+    await this.service.updateUs({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/reviews")
+  async disconnectReviews(
+    @common.Param() params: USWhereUniqueInput,
+    @common.Body() body: ReviewWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      reviews: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateUs({
+      where: params,
+      data,
+      select: { id: true },
+    });
   }
 }

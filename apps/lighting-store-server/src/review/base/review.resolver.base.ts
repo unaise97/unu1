@@ -17,7 +17,10 @@ import { Review } from "./Review";
 import { ReviewCountArgs } from "./ReviewCountArgs";
 import { ReviewFindManyArgs } from "./ReviewFindManyArgs";
 import { ReviewFindUniqueArgs } from "./ReviewFindUniqueArgs";
+import { CreateReviewArgs } from "./CreateReviewArgs";
+import { UpdateReviewArgs } from "./UpdateReviewArgs";
 import { DeleteReviewArgs } from "./DeleteReviewArgs";
+import { US } from "../../us/base/US";
 import { ReviewService } from "../review.service";
 @graphql.Resolver(() => Review)
 export class ReviewResolverBase {
@@ -49,6 +52,49 @@ export class ReviewResolverBase {
   }
 
   @graphql.Mutation(() => Review)
+  async createReview(@graphql.Args() args: CreateReviewArgs): Promise<Review> {
+    return await this.service.createReview({
+      ...args,
+      data: {
+        ...args.data,
+
+        light: args.data.light
+          ? {
+              connect: args.data.light,
+            }
+          : undefined,
+      },
+    });
+  }
+
+  @graphql.Mutation(() => Review)
+  async updateReview(
+    @graphql.Args() args: UpdateReviewArgs
+  ): Promise<Review | null> {
+    try {
+      return await this.service.updateReview({
+        ...args,
+        data: {
+          ...args.data,
+
+          light: args.data.light
+            ? {
+                connect: args.data.light,
+              }
+            : undefined,
+        },
+      });
+    } catch (error) {
+      if (isRecordNotFoundError(error)) {
+        throw new GraphQLError(
+          `No resource was found for ${JSON.stringify(args.where)}`
+        );
+      }
+      throw error;
+    }
+  }
+
+  @graphql.Mutation(() => Review)
   async deleteReview(
     @graphql.Args() args: DeleteReviewArgs
   ): Promise<Review | null> {
@@ -62,5 +108,18 @@ export class ReviewResolverBase {
       }
       throw error;
     }
+  }
+
+  @graphql.ResolveField(() => US, {
+    nullable: true,
+    name: "light",
+  })
+  async getLight(@graphql.Parent() parent: Review): Promise<US | null> {
+    const result = await this.service.getLight(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
   }
 }

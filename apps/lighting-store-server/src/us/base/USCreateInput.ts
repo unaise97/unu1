@@ -9,5 +9,134 @@ https://docs.amplication.com/how-to/custom-code
 
 ------------------------------------------------------------------------------
   */
-class USCreateInput {}
+import { InputType, Field } from "@nestjs/graphql";
+import { ApiProperty } from "@nestjs/swagger";
+import { CategoryWhereUniqueInput } from "../../category/base/CategoryWhereUniqueInput";
+import {
+  ValidateNested,
+  IsOptional,
+  IsString,
+  MaxLength,
+  IsNumber,
+  Min,
+  Max,
+  IsInt,
+} from "class-validator";
+import { Type } from "class-transformer";
+import { OrderCreateNestedManyWithoutUsItemsInput } from "./OrderCreateNestedManyWithoutUsItemsInput";
+import { ReviewCreateNestedManyWithoutUsItemsInput } from "./ReviewCreateNestedManyWithoutUsItemsInput";
+
+@InputType()
+class USCreateInput {
+  @ApiProperty({
+    required: false,
+    type: () => CategoryWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => CategoryWhereUniqueInput)
+  @IsOptional()
+  @Field(() => CategoryWhereUniqueInput, {
+    nullable: true,
+  })
+  category?: CategoryWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  description?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  indexCategory?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  name?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => OrderCreateNestedManyWithoutUsItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => OrderCreateNestedManyWithoutUsItemsInput)
+  @IsOptional()
+  @Field(() => OrderCreateNestedManyWithoutUsItemsInput, {
+    nullable: true,
+  })
+  orders?: OrderCreateNestedManyWithoutUsItemsInput;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsNumber()
+  @Min(-999999999)
+  @Max(999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  price?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ReviewCreateNestedManyWithoutUsItemsInput,
+  })
+  @ValidateNested()
+  @Type(() => ReviewCreateNestedManyWithoutUsItemsInput)
+  @IsOptional()
+  @Field(() => ReviewCreateNestedManyWithoutUsItemsInput, {
+    nullable: true,
+  })
+  reviews?: ReviewCreateNestedManyWithoutUsItemsInput;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Min(-999999999)
+  @Max(999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  stockQuantity?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  uniqueName?: string | null;
+}
+
 export { USCreateInput as USCreateInput };

@@ -22,6 +22,9 @@ import { Category } from "./Category";
 import { CategoryFindManyArgs } from "./CategoryFindManyArgs";
 import { CategoryWhereUniqueInput } from "./CategoryWhereUniqueInput";
 import { CategoryUpdateInput } from "./CategoryUpdateInput";
+import { USFindManyArgs } from "../../us/base/USFindManyArgs";
+import { US } from "../../us/base/US";
+import { USWhereUniqueInput } from "../../us/base/USWhereUniqueInput";
 
 export class CategoryControllerBase {
   constructor(protected readonly service: CategoryService) {}
@@ -34,7 +37,10 @@ export class CategoryControllerBase {
       data: data,
       select: {
         createdAt: true,
+        description: true,
         id: true,
+        name: true,
+        uniqueName: true,
         updatedAt: true,
       },
     });
@@ -49,7 +55,10 @@ export class CategoryControllerBase {
       ...args,
       select: {
         createdAt: true,
+        description: true,
         id: true,
+        name: true,
+        uniqueName: true,
         updatedAt: true,
       },
     });
@@ -65,7 +74,10 @@ export class CategoryControllerBase {
       where: params,
       select: {
         createdAt: true,
+        description: true,
         id: true,
+        name: true,
+        uniqueName: true,
         updatedAt: true,
       },
     });
@@ -90,7 +102,10 @@ export class CategoryControllerBase {
         data: data,
         select: {
           createdAt: true,
+          description: true,
           id: true,
+          name: true,
+          uniqueName: true,
           updatedAt: true,
         },
       });
@@ -115,7 +130,10 @@ export class CategoryControllerBase {
         where: params,
         select: {
           createdAt: true,
+          description: true,
           id: true,
+          name: true,
+          uniqueName: true,
           updatedAt: true,
         },
       });
@@ -127,5 +145,91 @@ export class CategoryControllerBase {
       }
       throw error;
     }
+  }
+
+  @common.Get("/:id/lights")
+  @ApiNestedQuery(USFindManyArgs)
+  async findLights(
+    @common.Req() request: Request,
+    @common.Param() params: CategoryWhereUniqueInput
+  ): Promise<US[]> {
+    const query = plainToClass(USFindManyArgs, request.query);
+    const results = await this.service.findLights(params.id, {
+      ...query,
+      select: {
+        category: {
+          select: {
+            id: true,
+          },
+        },
+
+        createdAt: true,
+        description: true,
+        id: true,
+        indexCategory: true,
+        name: true,
+        price: true,
+        stockQuantity: true,
+        uniqueName: true,
+        updatedAt: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/lights")
+  async connectLights(
+    @common.Param() params: CategoryWhereUniqueInput,
+    @common.Body() body: USWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      lights: {
+        connect: body,
+      },
+    };
+    await this.service.updateCategory({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/lights")
+  async updateLights(
+    @common.Param() params: CategoryWhereUniqueInput,
+    @common.Body() body: USWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      lights: {
+        set: body,
+      },
+    };
+    await this.service.updateCategory({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/lights")
+  async disconnectLights(
+    @common.Param() params: CategoryWhereUniqueInput,
+    @common.Body() body: USWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      lights: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateCategory({
+      where: params,
+      data,
+      select: { id: true },
+    });
   }
 }

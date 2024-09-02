@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
+import { ReviewModule } from "./review/review.module";
 import { OrderModule } from "./order/order.module";
 import { USModule } from "./us/us.module";
-import { ReviewModule } from "./review/review.module";
 import { CategoryModule } from "./category/category.module";
 import { ProjectModule } from "./project/project.module";
 import { HealthModule } from "./health/health.module";
@@ -16,9 +16,9 @@ import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
 @Module({
   controllers: [],
   imports: [
+    ReviewModule,
     OrderModule,
     USModule,
-    ReviewModule,
     CategoryModule,
     ProjectModule,
     HealthModule,

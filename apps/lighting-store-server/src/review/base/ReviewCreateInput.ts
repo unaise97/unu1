@@ -9,5 +9,70 @@ https://docs.amplication.com/how-to/custom-code
 
 ------------------------------------------------------------------------------
   */
-class ReviewCreateInput {}
+import { InputType, Field } from "@nestjs/graphql";
+import { ApiProperty } from "@nestjs/swagger";
+import {
+  IsString,
+  MaxLength,
+  IsOptional,
+  ValidateNested,
+  IsInt,
+  Min,
+  Max,
+} from "class-validator";
+import { USWhereUniqueInput } from "../../us/base/USWhereUniqueInput";
+import { Type } from "class-transformer";
+
+@InputType()
+class ReviewCreateInput {
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  comment?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  indexLight?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => USWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => USWhereUniqueInput)
+  @IsOptional()
+  @Field(() => USWhereUniqueInput, {
+    nullable: true,
+  })
+  light?: USWhereUniqueInput | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Min(-999999999)
+  @Max(999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  rating?: number | null;
+}
+
 export { ReviewCreateInput as ReviewCreateInput };

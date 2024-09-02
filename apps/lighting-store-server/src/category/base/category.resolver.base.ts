@@ -17,7 +17,11 @@ import { Category } from "./Category";
 import { CategoryCountArgs } from "./CategoryCountArgs";
 import { CategoryFindManyArgs } from "./CategoryFindManyArgs";
 import { CategoryFindUniqueArgs } from "./CategoryFindUniqueArgs";
+import { CreateCategoryArgs } from "./CreateCategoryArgs";
+import { UpdateCategoryArgs } from "./UpdateCategoryArgs";
 import { DeleteCategoryArgs } from "./DeleteCategoryArgs";
+import { USFindManyArgs } from "../../us/base/USFindManyArgs";
+import { US } from "../../us/base/US";
 import { CategoryService } from "../category.service";
 @graphql.Resolver(() => Category)
 export class CategoryResolverBase {
@@ -51,6 +55,35 @@ export class CategoryResolverBase {
   }
 
   @graphql.Mutation(() => Category)
+  async createCategory(
+    @graphql.Args() args: CreateCategoryArgs
+  ): Promise<Category> {
+    return await this.service.createCategory({
+      ...args,
+      data: args.data,
+    });
+  }
+
+  @graphql.Mutation(() => Category)
+  async updateCategory(
+    @graphql.Args() args: UpdateCategoryArgs
+  ): Promise<Category | null> {
+    try {
+      return await this.service.updateCategory({
+        ...args,
+        data: args.data,
+      });
+    } catch (error) {
+      if (isRecordNotFoundError(error)) {
+        throw new GraphQLError(
+          `No resource was found for ${JSON.stringify(args.where)}`
+        );
+      }
+      throw error;
+    }
+  }
+
+  @graphql.Mutation(() => Category)
   async deleteCategory(
     @graphql.Args() args: DeleteCategoryArgs
   ): Promise<Category | null> {
@@ -64,5 +97,19 @@ export class CategoryResolverBase {
       }
       throw error;
     }
+  }
+
+  @graphql.ResolveField(() => [US], { name: "lights" })
+  async findLights(
+    @graphql.Parent() parent: Category,
+    @graphql.Args() args: USFindManyArgs
+  ): Promise<US[]> {
+    const results = await this.service.findLights(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
   }
 }

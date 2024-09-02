@@ -17,7 +17,14 @@ import { US } from "./US";
 import { USCountArgs } from "./USCountArgs";
 import { USFindManyArgs } from "./USFindManyArgs";
 import { USFindUniqueArgs } from "./USFindUniqueArgs";
+import { CreateUSArgs } from "./CreateUSArgs";
+import { UpdateUSArgs } from "./UpdateUSArgs";
 import { DeleteUSArgs } from "./DeleteUSArgs";
+import { OrderFindManyArgs } from "../../order/base/OrderFindManyArgs";
+import { Order } from "../../order/base/Order";
+import { ReviewFindManyArgs } from "../../review/base/ReviewFindManyArgs";
+import { Review } from "../../review/base/Review";
+import { Category } from "../../category/base/Category";
 import { USService } from "../us.service";
 @graphql.Resolver(() => US)
 export class USResolverBase {
@@ -47,6 +54,47 @@ export class USResolverBase {
   }
 
   @graphql.Mutation(() => US)
+  async createUS(@graphql.Args() args: CreateUSArgs): Promise<US> {
+    return await this.service.createUs({
+      ...args,
+      data: {
+        ...args.data,
+
+        category: args.data.category
+          ? {
+              connect: args.data.category,
+            }
+          : undefined,
+      },
+    });
+  }
+
+  @graphql.Mutation(() => US)
+  async updateUS(@graphql.Args() args: UpdateUSArgs): Promise<US | null> {
+    try {
+      return await this.service.updateUs({
+        ...args,
+        data: {
+          ...args.data,
+
+          category: args.data.category
+            ? {
+                connect: args.data.category,
+              }
+            : undefined,
+        },
+      });
+    } catch (error) {
+      if (isRecordNotFoundError(error)) {
+        throw new GraphQLError(
+          `No resource was found for ${JSON.stringify(args.where)}`
+        );
+      }
+      throw error;
+    }
+  }
+
+  @graphql.Mutation(() => US)
   async deleteUS(@graphql.Args() args: DeleteUSArgs): Promise<US | null> {
     try {
       return await this.service.deleteUs(args);
@@ -58,5 +106,46 @@ export class USResolverBase {
       }
       throw error;
     }
+  }
+
+  @graphql.ResolveField(() => [Order], { name: "orders" })
+  async findOrders(
+    @graphql.Parent() parent: US,
+    @graphql.Args() args: OrderFindManyArgs
+  ): Promise<Order[]> {
+    const results = await this.service.findOrders(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @graphql.ResolveField(() => [Review], { name: "reviews" })
+  async findReviews(
+    @graphql.Parent() parent: US,
+    @graphql.Args() args: ReviewFindManyArgs
+  ): Promise<Review[]> {
+    const results = await this.service.findReviews(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @graphql.ResolveField(() => Category, {
+    nullable: true,
+    name: "category",
+  })
+  async getCategory(@graphql.Parent() parent: US): Promise<Category | null> {
+    const result = await this.service.getCategory(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
   }
 }

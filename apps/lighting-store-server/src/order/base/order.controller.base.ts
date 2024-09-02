@@ -29,10 +29,30 @@ export class OrderControllerBase {
   @swagger.ApiCreatedResponse({ type: Order })
   async createOrder(@common.Body() data: OrderCreateInput): Promise<Order> {
     return await this.service.createOrder({
-      data: data,
+      data: {
+        ...data,
+
+        light: data.light
+          ? {
+              connect: data.light,
+            }
+          : undefined,
+      },
       select: {
         createdAt: true,
         id: true,
+        indexLight: true,
+        indexOrderDate: true,
+
+        light: {
+          select: {
+            id: true,
+          },
+        },
+
+        orderDate: true,
+        quantity: true,
+        totalAmount: true,
         updatedAt: true,
       },
     });
@@ -48,6 +68,18 @@ export class OrderControllerBase {
       select: {
         createdAt: true,
         id: true,
+        indexLight: true,
+        indexOrderDate: true,
+
+        light: {
+          select: {
+            id: true,
+          },
+        },
+
+        orderDate: true,
+        quantity: true,
+        totalAmount: true,
         updatedAt: true,
       },
     });
@@ -64,6 +96,18 @@ export class OrderControllerBase {
       select: {
         createdAt: true,
         id: true,
+        indexLight: true,
+        indexOrderDate: true,
+
+        light: {
+          select: {
+            id: true,
+          },
+        },
+
+        orderDate: true,
+        quantity: true,
+        totalAmount: true,
         updatedAt: true,
       },
     });
@@ -85,10 +129,30 @@ export class OrderControllerBase {
     try {
       return await this.service.updateOrder({
         where: params,
-        data: data,
+        data: {
+          ...data,
+
+          light: data.light
+            ? {
+                connect: data.light,
+              }
+            : undefined,
+        },
         select: {
           createdAt: true,
           id: true,
+          indexLight: true,
+          indexOrderDate: true,
+
+          light: {
+            select: {
+              id: true,
+            },
+          },
+
+          orderDate: true,
+          quantity: true,
+          totalAmount: true,
           updatedAt: true,
         },
       });
@@ -114,6 +178,18 @@ export class OrderControllerBase {
         select: {
           createdAt: true,
           id: true,
+          indexLight: true,
+          indexOrderDate: true,
+
+          light: {
+            select: {
+              id: true,
+            },
+          },
+
+          orderDate: true,
+          quantity: true,
+          totalAmount: true,
           updatedAt: true,
         },
       });

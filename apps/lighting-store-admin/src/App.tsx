@@ -5,6 +5,10 @@ import { theme } from "./theme/theme";
 import Login from "./Login";
 import "./App.scss";
 import Dashboard from "./pages/Dashboard";
+import { ReviewList } from "./review/ReviewList";
+import { ReviewCreate } from "./review/ReviewCreate";
+import { ReviewEdit } from "./review/ReviewEdit";
+import { ReviewShow } from "./review/ReviewShow";
 import { OrderList } from "./order/OrderList";
 import { OrderCreate } from "./order/OrderCreate";
 import { OrderEdit } from "./order/OrderEdit";
@@ -13,10 +17,6 @@ import { USList } from "./us/USList";
 import { USCreate } from "./us/USCreate";
 import { USEdit } from "./us/USEdit";
 import { USShow } from "./us/USShow";
-import { ReviewList } from "./review/ReviewList";
-import { ReviewCreate } from "./review/ReviewCreate";
-import { ReviewEdit } from "./review/ReviewEdit";
-import { ReviewShow } from "./review/ReviewShow";
 import { CategoryList } from "./category/CategoryList";
 import { CategoryCreate } from "./category/CategoryCreate";
 import { CategoryEdit } from "./category/CategoryEdit";
@@ -52,6 +52,13 @@ const App = (): React.ReactElement => {
         loginPage={Login}
       >
         <Resource
+          name="Review"
+          list={ReviewList}
+          edit={ReviewEdit}
+          create={ReviewCreate}
+          show={ReviewShow}
+        />
+        <Resource
           name="Order"
           list={OrderList}
           edit={OrderEdit}
@@ -64,13 +71,6 @@ const App = (): React.ReactElement => {
           edit={USEdit}
           create={USCreate}
           show={USShow}
-        />
-        <Resource
-          name="Review"
-          list={ReviewList}
-          edit={ReviewEdit}
-          create={ReviewCreate}
-          show={ReviewShow}
         />
         <Resource
           name="Category"

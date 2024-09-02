@@ -29,10 +29,28 @@ export class ReviewControllerBase {
   @swagger.ApiCreatedResponse({ type: Review })
   async createReview(@common.Body() data: ReviewCreateInput): Promise<Review> {
     return await this.service.createReview({
-      data: data,
+      data: {
+        ...data,
+
+        light: data.light
+          ? {
+              connect: data.light,
+            }
+          : undefined,
+      },
       select: {
+        comment: true,
         createdAt: true,
         id: true,
+        indexLight: true,
+
+        light: {
+          select: {
+            id: true,
+          },
+        },
+
+        rating: true,
         updatedAt: true,
       },
     });
@@ -46,8 +64,18 @@ export class ReviewControllerBase {
     return this.service.reviews({
       ...args,
       select: {
+        comment: true,
         createdAt: true,
         id: true,
+        indexLight: true,
+
+        light: {
+          select: {
+            id: true,
+          },
+        },
+
+        rating: true,
         updatedAt: true,
       },
     });
@@ -62,8 +90,18 @@ export class ReviewControllerBase {
     const result = await this.service.review({
       where: params,
       select: {
+        comment: true,
         createdAt: true,
         id: true,
+        indexLight: true,
+
+        light: {
+          select: {
+            id: true,
+          },
+        },
+
+        rating: true,
         updatedAt: true,
       },
     });
@@ -85,10 +123,28 @@ export class ReviewControllerBase {
     try {
       return await this.service.updateReview({
         where: params,
-        data: data,
+        data: {
+          ...data,
+
+          light: data.light
+            ? {
+                connect: data.light,
+              }
+            : undefined,
+        },
         select: {
+          comment: true,
           createdAt: true,
           id: true,
+          indexLight: true,
+
+          light: {
+            select: {
+              id: true,
+            },
+          },
+
+          rating: true,
           updatedAt: true,
         },
       });
@@ -112,8 +168,18 @@ export class ReviewControllerBase {
       return await this.service.deleteReview({
         where: params,
         select: {
+          comment: true,
           createdAt: true,
           id: true,
+          indexLight: true,
+
+          light: {
+            select: {
+              id: true,
+            },
+          },
+
+          rating: true,
           updatedAt: true,
         },
       });

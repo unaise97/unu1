@@ -34,7 +34,10 @@ export class ProjectControllerBase {
       data: data,
       select: {
         createdAt: true,
+        description: true,
         id: true,
+        name: true,
+        uniqueName: true,
         updatedAt: true,
       },
     });
@@ -49,7 +52,10 @@ export class ProjectControllerBase {
       ...args,
       select: {
         createdAt: true,
+        description: true,
         id: true,
+        name: true,
+        uniqueName: true,
         updatedAt: true,
       },
     });
@@ -65,7 +71,10 @@ export class ProjectControllerBase {
       where: params,
       select: {
         createdAt: true,
+        description: true,
         id: true,
+        name: true,
+        uniqueName: true,
         updatedAt: true,
       },
     });
@@ -90,7 +99,10 @@ export class ProjectControllerBase {
         data: data,
         select: {
           createdAt: true,
+          description: true,
           id: true,
+          name: true,
+          uniqueName: true,
           updatedAt: true,
         },
       });
@@ -115,7 +127,10 @@ export class ProjectControllerBase {
         where: params,
         select: {
           createdAt: true,
+          description: true,
           id: true,
+          name: true,
+          uniqueName: true,
           updatedAt: true,
         },
       });

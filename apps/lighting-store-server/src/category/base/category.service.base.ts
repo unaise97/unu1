@@ -10,7 +10,11 @@ https://docs.amplication.com/how-to/custom-code
 ------------------------------------------------------------------------------
   */
 import { PrismaService } from "../../prisma/prisma.service";
-import { Prisma, Category as PrismaCategory } from "@prisma/client";
+import {
+  Prisma,
+  Category as PrismaCategory,
+  US as PrismaUS,
+} from "@prisma/client";
 
 export class CategoryServiceBase {
   constructor(protected readonly prisma: PrismaService) {}
@@ -43,5 +47,16 @@ export class CategoryServiceBase {
     args: Prisma.CategoryDeleteArgs
   ): Promise<PrismaCategory> {
     return this.prisma.category.delete(args);
+  }
+
+  async findLights(
+    parentId: string,
+    args: Prisma.USFindManyArgs
+  ): Promise<PrismaUS[]> {
+    return this.prisma.category
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .lights(args);
   }
 }

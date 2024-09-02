@@ -10,7 +10,7 @@ https://docs.amplication.com/how-to/custom-code
 ------------------------------------------------------------------------------
   */
 import { PrismaService } from "../../prisma/prisma.service";
-import { Prisma, Review as PrismaReview } from "@prisma/client";
+import { Prisma, Review as PrismaReview, US as PrismaUS } from "@prisma/client";
 
 export class ReviewServiceBase {
   constructor(protected readonly prisma: PrismaService) {}
@@ -35,5 +35,13 @@ export class ReviewServiceBase {
   }
   async deleteReview(args: Prisma.ReviewDeleteArgs): Promise<PrismaReview> {
     return this.prisma.review.delete(args);
+  }
+
+  async getLight(parentId: string): Promise<PrismaUS | null> {
+    return this.prisma.review
+      .findUnique({
+        where: { id: parentId },
+      })
+      .light();
   }
 }

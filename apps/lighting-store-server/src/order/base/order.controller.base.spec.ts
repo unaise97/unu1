@@ -20,23 +20,43 @@ const existingId = "existingId";
 const CREATE_INPUT = {
   createdAt: new Date(),
   id: "exampleId",
+  indexLight: "exampleIndexLight",
+  indexOrderDate: new Date(),
+  orderDate: new Date(),
+  quantity: 42,
+  totalAmount: 42.42,
   updatedAt: new Date(),
 };
 const CREATE_RESULT = {
   createdAt: new Date(),
   id: "exampleId",
+  indexLight: "exampleIndexLight",
+  indexOrderDate: new Date(),
+  orderDate: new Date(),
+  quantity: 42,
+  totalAmount: 42.42,
   updatedAt: new Date(),
 };
 const FIND_MANY_RESULT = [
   {
     createdAt: new Date(),
     id: "exampleId",
+    indexLight: "exampleIndexLight",
+    indexOrderDate: new Date(),
+    orderDate: new Date(),
+    quantity: 42,
+    totalAmount: 42.42,
     updatedAt: new Date(),
   },
 ];
 const FIND_ONE_RESULT = {
   createdAt: new Date(),
   id: "exampleId",
+  indexLight: "exampleIndexLight",
+  indexOrderDate: new Date(),
+  orderDate: new Date(),
+  quantity: 42,
+  totalAmount: 42.42,
   updatedAt: new Date(),
 };
 
@@ -123,6 +143,8 @@ describe("Order", () => {
       .expect({
         ...CREATE_RESULT,
         createdAt: CREATE_RESULT.createdAt.toISOString(),
+        indexOrderDate: CREATE_RESULT.indexOrderDate.toISOString(),
+        orderDate: CREATE_RESULT.orderDate.toISOString(),
         updatedAt: CREATE_RESULT.updatedAt.toISOString(),
       });
   });
@@ -135,6 +157,8 @@ describe("Order", () => {
         {
           ...FIND_MANY_RESULT[0],
           createdAt: FIND_MANY_RESULT[0].createdAt.toISOString(),
+          indexOrderDate: FIND_MANY_RESULT[0].indexOrderDate.toISOString(),
+          orderDate: FIND_MANY_RESULT[0].orderDate.toISOString(),
           updatedAt: FIND_MANY_RESULT[0].updatedAt.toISOString(),
         },
       ]);
@@ -158,6 +182,8 @@ describe("Order", () => {
       .expect({
         ...FIND_ONE_RESULT,
         createdAt: FIND_ONE_RESULT.createdAt.toISOString(),
+        indexOrderDate: FIND_ONE_RESULT.indexOrderDate.toISOString(),
+        orderDate: FIND_ONE_RESULT.orderDate.toISOString(),
         updatedAt: FIND_ONE_RESULT.updatedAt.toISOString(),
       });
   });
@@ -171,6 +197,8 @@ describe("Order", () => {
       .expect({
         ...CREATE_RESULT,
         createdAt: CREATE_RESULT.createdAt.toISOString(),
+        indexOrderDate: CREATE_RESULT.indexOrderDate.toISOString(),
+        orderDate: CREATE_RESULT.orderDate.toISOString(),
         updatedAt: CREATE_RESULT.updatedAt.toISOString(),
       })
       .then(function () {

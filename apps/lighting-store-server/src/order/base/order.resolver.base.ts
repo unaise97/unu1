@@ -17,7 +17,10 @@ import { Order } from "./Order";
 import { OrderCountArgs } from "./OrderCountArgs";
 import { OrderFindManyArgs } from "./OrderFindManyArgs";
 import { OrderFindUniqueArgs } from "./OrderFindUniqueArgs";
+import { CreateOrderArgs } from "./CreateOrderArgs";
+import { UpdateOrderArgs } from "./UpdateOrderArgs";
 import { DeleteOrderArgs } from "./DeleteOrderArgs";
+import { US } from "../../us/base/US";
 import { OrderService } from "../order.service";
 @graphql.Resolver(() => Order)
 export class OrderResolverBase {
@@ -49,6 +52,49 @@ export class OrderResolverBase {
   }
 
   @graphql.Mutation(() => Order)
+  async createOrder(@graphql.Args() args: CreateOrderArgs): Promise<Order> {
+    return await this.service.createOrder({
+      ...args,
+      data: {
+        ...args.data,
+
+        light: args.data.light
+          ? {
+              connect: args.data.light,
+            }
+          : undefined,
+      },
+    });
+  }
+
+  @graphql.Mutation(() => Order)
+  async updateOrder(
+    @graphql.Args() args: UpdateOrderArgs
+  ): Promise<Order | null> {
+    try {
+      return await this.service.updateOrder({
+        ...args,
+        data: {
+          ...args.data,
+
+          light: args.data.light
+            ? {
+                connect: args.data.light,
+              }
+            : undefined,
+        },
+      });
+    } catch (error) {
+      if (isRecordNotFoundError(error)) {
+        throw new GraphQLError(
+          `No resource was found for ${JSON.stringify(args.where)}`
+        );
+      }
+      throw error;
+    }
+  }
+
+  @graphql.Mutation(() => Order)
   async deleteOrder(
     @graphql.Args() args: DeleteOrderArgs
   ): Promise<Order | null> {
@@ -62,5 +108,18 @@ export class OrderResolverBase {
       }
       throw error;
     }
+  }
+
+  @graphql.ResolveField(() => US, {
+    nullable: true,
+    name: "light",
+  })
+  async getLight(@graphql.Parent() parent: Order): Promise<US | null> {
+    const result = await this.service.getLight(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
   }
 }
