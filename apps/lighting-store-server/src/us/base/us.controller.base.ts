@@ -16,7 +16,11 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
+import * as nestAccessControl from "nest-access-control";
+import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
 import { USService } from "../us.service";
+import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
+import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
 import { USCreateInput } from "./USCreateInput";
 import { US } from "./US";
 import { USFindManyArgs } from "./USFindManyArgs";
@@ -29,10 +33,24 @@ import { ReviewFindManyArgs } from "../../review/base/ReviewFindManyArgs";
 import { Review } from "../../review/base/Review";
 import { ReviewWhereUniqueInput } from "../../review/base/ReviewWhereUniqueInput";
 
+@swagger.ApiBearerAuth()
+@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
 export class USControllerBase {
-  constructor(protected readonly service: USService) {}
+  constructor(
+    protected readonly service: USService,
+    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+  ) {}
+  @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Post()
   @swagger.ApiCreatedResponse({ type: US })
+  @nestAccessControl.UseRoles({
+    resource: "US",
+    action: "create",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async createUS(@common.Body() data: USCreateInput): Promise<US> {
     return await this.service.createUs({
       data: {
@@ -64,9 +82,18 @@ export class USControllerBase {
     });
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get()
   @swagger.ApiOkResponse({ type: [US] })
   @ApiNestedQuery(USFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "US",
+    action: "read",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async usItems(@common.Req() request: Request): Promise<US[]> {
     const args = plainToClass(USFindManyArgs, request.query);
     return this.service.usItems({
@@ -91,9 +118,18 @@ export class USControllerBase {
     });
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: US })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @nestAccessControl.UseRoles({
+    resource: "US",
+    action: "read",
+    possession: "own",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async us(@common.Param() params: USWhereUniqueInput): Promise<US | null> {
     const result = await this.service.us({
       where: params,
@@ -123,9 +159,18 @@ export class USControllerBase {
     return result;
   }
 
+  @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: US })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @nestAccessControl.UseRoles({
+    resource: "US",
+    action: "update",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async updateUS(
     @common.Param() params: USWhereUniqueInput,
     @common.Body() data: USUpdateInput
@@ -173,6 +218,14 @@ export class USControllerBase {
   @common.Delete("/:id")
   @swagger.ApiOkResponse({ type: US })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @nestAccessControl.UseRoles({
+    resource: "US",
+    action: "delete",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async deleteUS(
     @common.Param() params: USWhereUniqueInput
   ): Promise<US | null> {
@@ -207,8 +260,14 @@ export class USControllerBase {
     }
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/orders")
   @ApiNestedQuery(OrderFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "Order",
+    action: "read",
+    possession: "any",
+  })
   async findOrders(
     @common.Req() request: Request,
     @common.Param() params: USWhereUniqueInput
@@ -243,6 +302,11 @@ export class USControllerBase {
   }
 
   @common.Post("/:id/orders")
+  @nestAccessControl.UseRoles({
+    resource: "US",
+    action: "update",
+    possession: "any",
+  })
   async connectOrders(
     @common.Param() params: USWhereUniqueInput,
     @common.Body() body: OrderWhereUniqueInput[]
@@ -260,6 +324,11 @@ export class USControllerBase {
   }
 
   @common.Patch("/:id/orders")
+  @nestAccessControl.UseRoles({
+    resource: "US",
+    action: "update",
+    possession: "any",
+  })
   async updateOrders(
     @common.Param() params: USWhereUniqueInput,
     @common.Body() body: OrderWhereUniqueInput[]
@@ -277,6 +346,11 @@ export class USControllerBase {
   }
 
   @common.Delete("/:id/orders")
+  @nestAccessControl.UseRoles({
+    resource: "US",
+    action: "update",
+    possession: "any",
+  })
   async disconnectOrders(
     @common.Param() params: USWhereUniqueInput,
     @common.Body() body: OrderWhereUniqueInput[]
@@ -293,8 +367,14 @@ export class USControllerBase {
     });
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/reviews")
   @ApiNestedQuery(ReviewFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "Review",
+    action: "read",
+    possession: "any",
+  })
   async findReviews(
     @common.Req() request: Request,
     @common.Param() params: USWhereUniqueInput
@@ -327,6 +407,11 @@ export class USControllerBase {
   }
 
   @common.Post("/:id/reviews")
+  @nestAccessControl.UseRoles({
+    resource: "US",
+    action: "update",
+    possession: "any",
+  })
   async connectReviews(
     @common.Param() params: USWhereUniqueInput,
     @common.Body() body: ReviewWhereUniqueInput[]
@@ -344,6 +429,11 @@ export class USControllerBase {
   }
 
   @common.Patch("/:id/reviews")
+  @nestAccessControl.UseRoles({
+    resource: "US",
+    action: "update",
+    possession: "any",
+  })
   async updateReviews(
     @common.Param() params: USWhereUniqueInput,
     @common.Body() body: ReviewWhereUniqueInput[]
@@ -361,6 +451,11 @@ export class USControllerBase {
   }
 
   @common.Delete("/:id/reviews")
+  @nestAccessControl.UseRoles({
+    resource: "US",
+    action: "update",
+    possession: "any",
+  })
   async disconnectReviews(
     @common.Param() params: USWhereUniqueInput,
     @common.Body() body: ReviewWhereUniqueInput[]

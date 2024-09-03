@@ -13,6 +13,12 @@ import * as graphql from "@nestjs/graphql";
 import { GraphQLError } from "graphql";
 import { isRecordNotFoundError } from "../../prisma.util";
 import { MetaQueryPayload } from "../../util/MetaQueryPayload";
+import * as nestAccessControl from "nest-access-control";
+import * as gqlACGuard from "../../auth/gqlAC.guard";
+import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
+import * as common from "@nestjs/common";
+import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
+import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { US } from "./US";
 import { USCountArgs } from "./USCountArgs";
 import { USFindManyArgs } from "./USFindManyArgs";
@@ -26,10 +32,20 @@ import { ReviewFindManyArgs } from "../../review/base/ReviewFindManyArgs";
 import { Review } from "../../review/base/Review";
 import { Category } from "../../category/base/Category";
 import { USService } from "../us.service";
+@common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => US)
 export class USResolverBase {
-  constructor(protected readonly service: USService) {}
+  constructor(
+    protected readonly service: USService,
+    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+  ) {}
 
+  @graphql.Query(() => MetaQueryPayload)
+  @nestAccessControl.UseRoles({
+    resource: "US",
+    action: "read",
+    possession: "any",
+  })
   async _usItemsMeta(
     @graphql.Args() args: USCountArgs
   ): Promise<MetaQueryPayload> {
@@ -39,12 +55,24 @@ export class USResolverBase {
     };
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => [US])
+  @nestAccessControl.UseRoles({
+    resource: "US",
+    action: "read",
+    possession: "any",
+  })
   async usItems(@graphql.Args() args: USFindManyArgs): Promise<US[]> {
     return this.service.usItems(args);
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => US, { nullable: true })
+  @nestAccessControl.UseRoles({
+    resource: "US",
+    action: "read",
+    possession: "own",
+  })
   async us(@graphql.Args() args: USFindUniqueArgs): Promise<US | null> {
     const result = await this.service.us(args);
     if (result === null) {
@@ -53,7 +81,13 @@ export class USResolverBase {
     return result;
   }
 
+  @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => US)
+  @nestAccessControl.UseRoles({
+    resource: "US",
+    action: "create",
+    possession: "any",
+  })
   async createUS(@graphql.Args() args: CreateUSArgs): Promise<US> {
     return await this.service.createUs({
       ...args,
@@ -69,7 +103,13 @@ export class USResolverBase {
     });
   }
 
+  @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => US)
+  @nestAccessControl.UseRoles({
+    resource: "US",
+    action: "update",
+    possession: "any",
+  })
   async updateUS(@graphql.Args() args: UpdateUSArgs): Promise<US | null> {
     try {
       return await this.service.updateUs({
@@ -95,6 +135,11 @@ export class USResolverBase {
   }
 
   @graphql.Mutation(() => US)
+  @nestAccessControl.UseRoles({
+    resource: "US",
+    action: "delete",
+    possession: "any",
+  })
   async deleteUS(@graphql.Args() args: DeleteUSArgs): Promise<US | null> {
     try {
       return await this.service.deleteUs(args);
@@ -108,7 +153,13 @@ export class USResolverBase {
     }
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [Order], { name: "orders" })
+  @nestAccessControl.UseRoles({
+    resource: "Order",
+    action: "read",
+    possession: "any",
+  })
   async findOrders(
     @graphql.Parent() parent: US,
     @graphql.Args() args: OrderFindManyArgs
@@ -122,7 +173,13 @@ export class USResolverBase {
     return results;
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [Review], { name: "reviews" })
+  @nestAccessControl.UseRoles({
+    resource: "Review",
+    action: "read",
+    possession: "any",
+  })
   async findReviews(
     @graphql.Parent() parent: US,
     @graphql.Args() args: ReviewFindManyArgs
@@ -136,9 +193,15 @@ export class USResolverBase {
     return results;
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => Category, {
     nullable: true,
     name: "category",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "Category",
+    action: "read",
+    possession: "any",
   })
   async getCategory(@graphql.Parent() parent: US): Promise<Category | null> {
     const result = await this.service.getCategory(parent.id);

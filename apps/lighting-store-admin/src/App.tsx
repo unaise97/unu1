@@ -25,7 +25,15 @@ import { ProjectList } from "./project/ProjectList";
 import { ProjectCreate } from "./project/ProjectCreate";
 import { ProjectEdit } from "./project/ProjectEdit";
 import { ProjectShow } from "./project/ProjectShow";
-import { jwtAuthProvider } from "./auth-provider/ra-auth-jwt";
+import { UserList } from "./user/UserList";
+import { UserCreate } from "./user/UserCreate";
+import { UserEdit } from "./user/UserEdit";
+import { UserShow } from "./user/UserShow";
+import { Unaise988List } from "./unaise988/Unaise988List";
+import { Unaise988Create } from "./unaise988/Unaise988Create";
+import { Unaise988Edit } from "./unaise988/Unaise988Edit";
+import { Unaise988Show } from "./unaise988/Unaise988Show";
+import { httpAuthProvider } from "./auth-provider/ra-auth-http";
 
 const App = (): React.ReactElement => {
   const [dataProvider, setDataProvider] = useState<DataProvider | null>(null);
@@ -46,7 +54,7 @@ const App = (): React.ReactElement => {
       <Admin
         title={"LightingStore"}
         dataProvider={dataProvider}
-        authProvider={jwtAuthProvider}
+        authProvider={httpAuthProvider}
         theme={theme}
         dashboard={Dashboard}
         loginPage={Login}
@@ -85,6 +93,20 @@ const App = (): React.ReactElement => {
           edit={ProjectEdit}
           create={ProjectCreate}
           show={ProjectShow}
+        />
+        <Resource
+          name="User"
+          list={UserList}
+          edit={UserEdit}
+          create={UserCreate}
+          show={UserShow}
+        />
+        <Resource
+          name="Unaise988"
+          list={Unaise988List}
+          edit={Unaise988Edit}
+          create={Unaise988Create}
+          show={Unaise988Show}
         />
       </Admin>
     </div>
