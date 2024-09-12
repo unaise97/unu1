@@ -44,6 +44,12 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+
+
+
+{#boti 
+plure unlock 
+ping 198.68.09.01}
   },
   "devDependencies": {
     "@testing-library/jest-dom": "5.14.1",
